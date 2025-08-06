@@ -1,8 +1,16 @@
 const express = require('express');
-const app = express();
 const mongoose = require('mongoose');
+const userRouter = require('./routes/users');
+const app = express();
+
 const { PORT = 3001 } = process.env;
 
+
+// Middleware to parse JSON bodies
+app.use(express.json());
+
+// Use the users router for requests to /users
+app.use('/users', userRouter);
 
 
 app.listen(PORT, () => {
