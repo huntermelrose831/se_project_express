@@ -30,6 +30,7 @@ jobs:
         run: |
           mkdir -p ./postman
           cp "postman.json" ./postman/
+          # This copies your renamed file (postman.json) to the postman directory
 
       - name: Create environment file
         run: |
@@ -86,24 +87,34 @@ jobs:
           }
           EOL
 
-      - name: Start API server
-        run: npm start &
-        env:
-          PORT: 3001
-          NODE_ENV: test
-          JWT_SECRET: ${{ secrets.JWT_SECRET || 'dev-secret' }}
-          MONGODB_URI: mongodb://localhost:27017/test_db
-
       - name: Install and start MongoDB
         uses: supercharge/mongodb-github-action@1.10.0
         with:
           mongodb-version: "5.0"
           mongodb-replica-set: test-rs
 
+      # CHANGE 1: Start API server with debugging
+      - name: Start API server
+        run: |
+          npm start > api.log 2>&1 &
+          # This runs your server and redirects both standard output (>) and errors (2>&1) to api.log
+          # The & at the end makes the process run in background so the workflow can continue
+          sleep 10
+          # Added a longer initial sleep to give the API more time to initialize before checking logs
+          cat api.log
+          # This displays the log file so you can see startup messages in the workflow output
+        env:
+          PORT: 3001
+          NODE_ENV: test
+          JWT_SECRET: ${{ secrets.JWT_SECRET || 'dev-secret' }}
+          MONGODB_URI: mongodb://localhost:27017/test_db
+
+      # CHANGE 2: Improved wait script with better debugging
       - name: Wait for API server to start
         run: |
           echo "Waiting for API server to start..."
-          timeout=60
+          timeout=90
+          # Increased timeout from 60 to 90 seconds to give your API more time to start
           counter=0
           while ! curl --output /dev/null --silent --head --fail http://localhost:3001; do
             printf '.'
@@ -111,13 +122,22 @@ jobs:
             counter=$((counter + 1))
             if [ $counter -eq $timeout ]; then
               echo "API server failed to start within $timeout seconds."
+              echo "Checking what processes are running:"
+              ps aux | grep node
+              # This shows what Node.js processes are running
+              echo "Checking API logs:"
+              cat api.log
+              # This shows the full API log to help diagnose startup issues
               exit 1
             fi
           done
           echo "API server is up and running."
 
+      # CHANGE 3: Updated Newman command to use the correct filename
       - name: Run Postman tests with Newman
-        run: newman run ./postman/Sprint\ 12\ Tests.postman_collection.json -e ./postman/environment.json --bail
+        run: newman run ./postman/postman.json -e ./postman/environment.json --bail
+        # Changed from ./postman/Sprint\ 12\ Tests.postman_collection.json to ./postman/postman.json
+        # to match the filename you're now using
 
       - name: Stop API server
         if: always()
