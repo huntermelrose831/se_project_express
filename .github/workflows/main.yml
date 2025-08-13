@@ -87,7 +87,7 @@ jobs:
           EOL
 
       - name: Start API server
-        run: npm run start &
+        run: npm start &
         env:
           PORT: 3001
           NODE_ENV: test
