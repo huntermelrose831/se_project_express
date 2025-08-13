@@ -8,7 +8,7 @@ const getUsers = (req, res) => {
     })
     .catch((err) => {
       console.error(err);
-      res.status(500).send({ message: err.message }); // Add this line
+      res.status(500).send({ message: err.message });
     });
 };
 const createUser = (req, res) => {
