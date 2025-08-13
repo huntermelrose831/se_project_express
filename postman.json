@@ -14,7 +14,7 @@
 					"name": "[+] [POST] Add User",
 					"event": [
 						{
-							"listen": "test",
+							"listen": "testUser",
 							"script": {
 								"exec": [
 									"pm.test(\"Status code should be 200 or 201\", () => {\r",
