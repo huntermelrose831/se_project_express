@@ -1,0 +1,124 @@
+name: API Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Install Newman
+        run: npm install -g newman
+      
+      - name: Copy Postman collection
+        run: |
+          mkdir -p ./postman
+          cp "Sprint 12 Tests.postman_collection.json" ./postman/
+      
+      - name: Create environment file
+        run: |
+          cat > ./postman/environment.json << EOL
+          {
+            "name": "Test Environment",
+            "values": [
+              {
+                "key": "base_url",
+                "value": "http://localhost:3001",
+                "enabled": true
+              },
+              {
+                "key": "user_name",
+                "value": "testUser",
+                "enabled": true
+              },
+              {
+                "key": "user_avatar",
+                "value": "https://example.com/avatar.jpg",
+                "enabled": true
+              },
+              {
+                "key": "user_id_const",
+                "value": "61eade4c6d5acf558c42d9b8",
+                "enabled": true
+              },
+              {
+                "key": "user_avatar_incorrect",
+                "value": "https://thisisnotvalidurl",
+                "enabled": true
+              },
+              {
+                "key": "item_name",
+                "value": "testItem",
+                "enabled": true
+              },
+              {
+                "key": "item_imageUrl",
+                "value": "https://example.com/image.jpg",
+                "enabled": true
+              },
+              {
+                "key": "item_weather",
+                "value": "hot",
+                "enabled": true
+              },
+              {
+                "key": "item_imageUrl_incorrect",
+                "value": "https://thisisnotvalidurl",
+                "enabled": true
+              }
+            ]
+          }
+          EOL
+      
+      - name: Start API server
+        run: npm run start &
+        env:
+          PORT: 3001
+          NODE_ENV: test
+          JWT_SECRET: ${{ secrets.JWT_SECRET || 'dev-secret' }}
+          MONGODB_URI: mongodb://localhost:27017/test_db
+      
+      - name: Install and start MongoDB
+        uses: supercharge/mongodb-github-action@1.10.0
+        with:
+          mongodb-version: '5.0'
+          mongodb-replica-set: test-rs
+      
+      - name: Wait for API server to start
+        run: |
+          echo "Waiting for API server to start..."
+          timeout=60
+          counter=0
+          while ! curl --output /dev/null --silent --head --fail http://localhost:3001; do
+            printf '.'
+            sleep 1
+            counter=$((counter + 1))
+            if [ $counter -eq $timeout ]; then
+              echo "API server failed to start within $timeout seconds."
+              exit 1
+            fi
+          done
+          echo "API server is up and running."
+      
+      - name: Run Postman tests with Newman
+        run: newman run ./postman/Sprint\ 12\ Tests.postman_collection.json -e ./postman/environment.json --bail
+      
+      - name: Stop API server
+        if: always()
+        run: pkill -f "node" || true
