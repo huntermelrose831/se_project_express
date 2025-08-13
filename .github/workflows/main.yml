@@ -109,30 +109,6 @@ jobs:
           JWT_SECRET: ${{ secrets.JWT_SECRET || 'dev-secret' }}
           MONGODB_URI: mongodb://localhost:27017/test_db
 
-      # CHANGE 2: Improved wait script with better debugging
-      - name: Wait for API server to start
-        run: |
-          echo "Waiting for API server to start..."
-          timeout=90
-          # Increased timeout from 60 to 90 seconds to give your API more time to start
-          counter=0
-          while ! curl --output /dev/null --silent --head --fail http://localhost:3001; do
-            printf '.'
-            sleep 1
-            counter=$((counter + 1))
-            if [ $counter -eq $timeout ]; then
-              echo "API server failed to start within $timeout seconds."
-              echo "Checking what processes are running:"
-              ps aux | grep node
-              # This shows what Node.js processes are running
-              echo "Checking API logs:"
-              cat api.log
-              # This shows the full API log to help diagnose startup issues
-              exit 1
-            fi
-          done
-          echo "API server is up and running."
-
       # CHANGE 3: Updated Newman command to use the correct filename
       - name: Run Postman tests with Newman
         run: newman run ./postman/postman.json -e ./postman/environment.json --bail
