@@ -1,0 +1,1618 @@
+{
+	"info": {
+		"_postman_id": "b682dee1-06ee-4cb1-a92f-aa55b683fd2d",
+		"name": "Sprint 12 Tests",
+		"description": "In sprint 12 you've learned how to work with databases, set up security, and deploy your web application on a remote machine. Once you've created a server with an API and user authorization, it is time now to test your project with Postman tests.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "46722483"
+	},
+	"item": [
+		{
+			"name": "signup",
+			"item": [
+				{
+					"name": "[+] [POST] Add User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code should be 200 or 201\", () => {\r",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response body should have json with form data\", () => {\r",
+									"    const user = utils.getData(pm.response.json());\r",
+									"\r",
+									"    pm.expect(user.name).to.eql(pm.collectionVariables.get(\"user_name\"));\r",
+									"    pm.expect(user.avatar).to.eql(pm.collectionVariables.get(\"user_avatar\"));\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response body should have json with _id field\", () => {\r",
+									"    const user = utils.getData(pm.response.json());\r",
+									"\r",
+									"    pm.expect(user).to.have.property('_id');\r",
+									"    \r",
+									"    pm.collectionVariables.set(\"user_id\", user._id);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"{{user_name}}\",\r\n    \"avatar\": \"{{user_avatar}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[-] [POST] Add a user with \"name\" field less than 2 characters",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code should be 400\", () => {\r",
+									"  pm.response.to.have.status(400);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response body should have json with a 'message' property\", () => {\r",
+									"  pm.response.to.have.jsonSchema(JSON.parse(pm.collectionVariables.get(\"schema_message_only\")))\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"{{$randomAlphaNumeric}}\",\r\n    \"avatar\": \"{{user_avatar}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[-] [POST] Add a user with \"name\" field greater than 30 characters",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code should be 400\", () => {\r",
+									"  pm.response.to.have.status(400);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response body should have json with a 'message' property\", () => {\r",
+									"  pm.response.to.have.jsonSchema(JSON.parse(pm.collectionVariables.get(\"schema_message_only\")));\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"{{$randomLoremSentences}}\",\r\n    \"avatar\": \"{{user_avatar}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[-] [POST] Add a user without the required \"name\" field",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code should be 400\", () => {\r",
+									"  pm.response.to.have.status(400);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response body should have json with a 'message' property\", () => {\r",
+									"  pm.response.to.have.jsonSchema(JSON.parse(pm.collectionVariables.get(\"schema_message_only\")))\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"avatar\": \"{{user_avatar}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[-] [POST] Add a user without the required \"avatar\" field",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code should be 400\", () => {\r",
+									"  pm.response.to.have.status(400);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response body should have json with a 'message' property\", () => {\r",
+									"  pm.response.to.have.jsonSchema(JSON.parse(pm.collectionVariables.get(\"schema_message_only\")))\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"{{user_name}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[-] [POST] Add a user with an invalid url to the \"avatar\" field",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code should be 400\", () => {\r",
+									"  pm.response.to.have.status(400);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response body should have json with a 'message' property\", () => {\r",
+									"  pm.response.to.have.jsonSchema(JSON.parse(pm.collectionVariables.get(\"schema_message_only\")))\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"{{user_name}}\",\r\n    \"avatar\": \"{{user_avatar_incorrect}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "users",
+			"item": [
+				{
+					"name": "[+] [GET] Get list of users",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const name = pm.collectionVariables.get('user_name');",
+									"const avatar = pm.collectionVariables.get('user_avatar');",
+									"",
+									"const createUserReqOpts = {",
+									"    url: `${pm.collectionVariables.get(\"base_url\")}/users`,",
+									"    method: 'POST',",
+									"    header: {",
+									"        'Content-Type': 'application/json',",
+									"    },",
+									"    body: JSON.stringify({ name, avatar })",
+									"}",
+									"",
+									"pm.sendRequest(createUserReqOpts, function (error, response) {",
+									"    pm.test(\"Preliminary POST /users request should be successful\", () => {",
+									"        pm.expect(response.code).to.be.oneOf([200, 201]);",
+									"    });",
+									"",
+									"    try {",
+									"        if (response.json()) {",
+									"            const user = utils.getData(response.json());",
+									"            pm.collectionVariables.set(\"user_id\", user._id);",
+									"        }",
+									"    } catch (e) { }",
+									"",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code should be 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response body should be an array of users\", () => {\r",
+									"    const users = utils.getData(pm.response.json());\r",
+									"    \r",
+									"    pm.expect(users).to.be.an(\"array\");\r",
+									"    pm.expect(users.length).not.to.equal(0);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[+] [GET] Get a user by _id",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const name = pm.collectionVariables.get('user_name');",
+									"const avatar = pm.collectionVariables.get('user_avatar');",
+									"",
+									"const createUserReqOpts = {",
+									"\turl: `${pm.collectionVariables.get(\"base_url\")}/users`,",
+									"  method: 'POST',",
+									"  header: {",
+									"    'Content-Type': 'application/json',",
+									"  },",
+									"  body: JSON.stringify({ name, avatar })",
+									"}",
+									"",
+									"pm.sendRequest(createUserReqOpts, function (error, response) {",
+									"  pm.test(\"Preliminary POST /users request should be successful\", () => {",
+									"    pm.expect(response.code).to.be.oneOf([200, 201]);",
+									"  });",
+									"  try {",
+									"    if (response.json()) {",
+									"      const user = utils.getData(response.json());",
+									"      pm.collectionVariables.set(\"user_id\", user._id);",
+									"    }",
+									"  } catch (e) {}  ",
+									"  ",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code should be 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response body should have json with user data\", () => {\r",
+									"    const user = utils.getData(pm.response.json());\r",
+									"\r",
+									"    pm.expect(user.name).to.eql(pm.collectionVariables.get(\"user_name\"));\r",
+									"    pm.expect(user.avatar).to.eql(pm.collectionVariables.get(\"user_avatar\"));\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/users/:userid",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								":userid"
+							],
+							"variable": [
+								{
+									"key": "userid",
+									"value": "{{user_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[-] [GET] Get a user with an invalid _id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code should be 400\", () => {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response body should have json with a 'message' property\", () => {\r",
+									"    pm.response.to.have.jsonSchema(JSON.parse(pm.collectionVariables.get(\"schema_message_only\")))\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/users/invalid-fake-user-id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"invalid-fake-user-id"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[-] [GET] Get a user with an _id that does not exist in the database",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code should be 404\", function () {\r",
+									"    pm.response.to.have.status(404);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response body should have json with a 'message' property\", () => {\r",
+									"    pm.response.to.have.jsonSchema(JSON.parse(pm.collectionVariables.get(\"schema_message_only\")))\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/users/:userid",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								":userid"
+							],
+							"variable": [
+								{
+									"key": "userid",
+									"value": "{{user_id_const}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "items",
+			"item": [
+				{
+					"name": "[+] [POST] Add an item",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code should be 200 or 201\", () => {\r",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response body should have json with form data\", () => {\r",
+									"    const item = utils.getData(pm.response.json());\r",
+									"\r",
+									"    pm.expect(item.name).to.eql(pm.collectionVariables.get(\"item_name\"));\r",
+									"    pm.expect(item.weather).to.eql(pm.collectionVariables.get(\"item_weather\"));\r",
+									"    pm.expect(item.imageUrl).to.eql(pm.collectionVariables.get(\"item_imageUrl\"));\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response body should have json with filed _id\", () => {\r",
+									"    const item = utils.getData(pm.response.json());\r",
+									"\r",
+									"    pm.expect(item).to.have.property('_id');\r",
+									"\r",
+									"    pm.collectionVariables.set(\"item_id\", item._id);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"{{item_name}}\",\r\n    \"weather\": \"{{item_weather}}\",\r\n    \"imageUrl\": \"{{item_imageUrl}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/items",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[-] [POST] Add an item with \"name\" field less than 2 characters",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code should be 400\", () => {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response body should have json with a 'message' property\", () => {\r",
+									"    pm.response.to.have.jsonSchema(JSON.parse(pm.collectionVariables.get(\"schema_message_only\")))\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"{{$randomAlphaNumeric}}\",\r\n    \"weather\": \"{{item_weather}}\",\r\n    \"imageUrl\": \"{{item_imageUrl}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/items",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[-] [POST] Add an item with \"name\" field greater than 30 characters",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code should be 400\", () => {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response body should have json with a 'message' property\", () => {\r",
+									"    pm.response.to.have.jsonSchema(JSON.parse(pm.collectionVariables.get(\"schema_message_only\")))\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"{{$randomLoremSentences}}\",\r\n    \"weather\": \"{{item_weather}}\",\r\n    \"imageUrl\": \"{{item_imageUrl}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/items",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[-] [POST] Add an item without the required \"name\" field",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code should be 400\", () => {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response body should have json with a 'message' property\", () => {\r",
+									"    pm.response.to.have.jsonSchema(JSON.parse(pm.collectionVariables.get(\"schema_message_only\")))\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"weather\": \"{{item_weather}}\",\r\n    \"imageUrl\": \"{{item_imageUrl}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/items",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[-] [POST] Add an item without the required \"weather\" field",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code should be 400\", () => {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response body should have json with a 'message' property\", () => {\r",
+									"    pm.response.to.have.jsonSchema(JSON.parse(pm.collectionVariables.get(\"schema_message_only\")))\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"{{item_name}}\",\r\n    \"imageUrl\": \"{{item_imageUrl}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/items",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[-] [POST] Add an item with an invalid url to the \"imageUrl\" field",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code should be 400\", () => {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response body should have json with a 'message' property\", () => {\r",
+									"    pm.response.to.have.jsonSchema(JSON.parse(pm.collectionVariables.get(\"schema_message_only\")))\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"{{item_name}}\",\r\n    \"weather\": \"{{item_weather}}\",\r\n    \"imageUrl\": \"{{item_imageUrl_incorrect}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/items",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[+] [GET] Get list of items",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const name = pm.collectionVariables.get('item_name');",
+									"const weather = pm.collectionVariables.get('item_weather');",
+									"const imageUrl = pm.collectionVariables.get('item_imageUrl');",
+									"",
+									"const createItemReqOpts = {",
+									"\turl: `${pm.collectionVariables.get(\"base_url\")}/items`,",
+									"  method: 'POST',",
+									"  header: {",
+									"    'Content-Type': 'application/json',",
+									"  },",
+									"  body: JSON.stringify({ name, weather, imageUrl })",
+									"}",
+									"",
+									"pm.sendRequest(createItemReqOpts, function (error, response) {",
+									"  pm.test(\"Preliminary POST /items request should be successful\", () => {",
+									"    pm.expect(response.code).to.be.oneOf([200, 201]);",
+									"  });",
+									"  try {",
+									"    if (response.json()) {",
+									"      const item = utils.getData(response.json());",
+									"      pm.collectionVariables.set(\"item_id\", item._id);",
+									"    }",
+									"  } catch (e) {}",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code should be 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response body should be a list of items\", () => {\r",
+									"    const items = utils.getData(pm.response.json());\r",
+									"    \r",
+									"    pm.expect(items).to.be.an(\"array\");\r",
+									"    pm.expect(items.length).not.to.equal(0);\r",
+									"\r",
+									"    pm.collectionVariables.set(\"user_id_code\", items[items.length - 1].owner);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/items",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[+] [PUT] Likes an item",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const name = pm.collectionVariables.get('item_name');",
+									"const weather = pm.collectionVariables.get('item_weather');",
+									"const imageUrl = pm.collectionVariables.get('item_imageUrl');",
+									"",
+									"const createItemReqOpts = {",
+									"\turl: `${pm.collectionVariables.get(\"base_url\")}/items`,",
+									"  method: 'POST',",
+									"  header: {",
+									"    'Content-Type': 'application/json',",
+									"  },",
+									"  body: JSON.stringify({ name, weather, imageUrl })",
+									"}",
+									"",
+									"pm.sendRequest(createItemReqOpts, function (error, response) {",
+									"",
+									"  pm.test(\"Preliminary POST /items request is successful\", () => {",
+									"    pm.expect(response.code).to.be.oneOf([200, 201]);",
+									"  });",
+									"",
+									"  try {",
+									"    if (response.json()) {",
+									"      const item = utils.getData(response.json());",
+									"      pm.collectionVariables.set(\"item_id\", item._id);",
+									"    }",
+									"  } catch (e) {}",
+									"  ",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code should be 200 or 201\", () => {\r",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/items/:id/likes",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"items",
+								":id",
+								"likes"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{item_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[-] [PUT] Likes an item with an incorrect _id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code should be 400\", () => {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response body should have json with a 'message' property\", () => {\r",
+									"    pm.response.to.have.jsonSchema(JSON.parse(pm.collectionVariables.get(\"schema_message_only\")))\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/items/:id/likes",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"items",
+								":id",
+								"likes"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "text"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[-] [PUT] Likes an item with a non-existent _id in the database",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code should be 404\", () => {\r",
+									"    pm.response.to.have.status(404);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response body should have json with a 'message' property\", () => {\r",
+									"    pm.response.to.have.jsonSchema(JSON.parse(pm.collectionVariables.get(\"schema_message_only\")))\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/items/:id/likes",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"items",
+								":id",
+								"likes"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{user_id_const}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[-] [DELETE] Unlikes an item with an incorrect _id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code should be 400\", () => {\r",
+									"  pm.response.to.have.status(400);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response body should have json with a 'message' property\", () => {\r",
+									"  pm.response.to.have.jsonSchema(JSON.parse(pm.collectionVariables.get(\"schema_message_only\")))\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/items/:id/likes",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"items",
+								":id",
+								"likes"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "text"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[-] [DELETE] Unlikes an item with a non-existent _id in the database",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code should be 404\", () => {\r",
+									"    pm.response.to.have.status(404);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response body should have json with a 'message' property\", () => {\r",
+									"    pm.response.to.have.jsonSchema(JSON.parse(pm.collectionVariables.get(\"schema_message_only\")))\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/items/:id/likes",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"items",
+								":id",
+								"likes"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{user_id_const}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[+] [DELETE] Unlikes an item",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code should be 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const name = pm.collectionVariables.get('item_name');",
+									"const weather = pm.collectionVariables.get('item_weather');",
+									"const imageUrl = pm.collectionVariables.get('item_imageUrl');",
+									"",
+									"const createItemReqOpts = {",
+									"\turl: `${pm.collectionVariables.get(\"base_url\")}/items`,",
+									"  method: 'POST',",
+									"  header: {",
+									"    'Content-Type': 'application/json',",
+									"  },",
+									"  body: JSON.stringify({ name, weather, imageUrl })",
+									"}",
+									"",
+									"pm.sendRequest(createItemReqOpts, function (error, response) {",
+									"  ",
+									"  if (response.json()) {",
+									"    const item = utils.getData(response.json());",
+									"\t\tpm.collectionVariables.set(\"item_id\", item._id);",
+									"  }",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/items/:id/likes",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"items",
+								":id",
+								"likes"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{item_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[+] [GET] Check if an item has no likes after delete it",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"The response body should have json with an empty 'likes' property\", () => {\r",
+									"    const items = utils.getData(pm.response.json());\r",
+									"    console.log({ items })\r",
+									"    const userId = pm.collectionVariables.get(\"user_id_code\");\r",
+									"    const itemId = pm.collectionVariables.get(\"item_id\");\r",
+									"    const item = items?.find((item) => item._id === itemId);\r",
+									"\r",
+									"    pm.expect(!!item?.likes?.includes(userId)).to.eq(false);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const name = pm.collectionVariables.get('item_name');",
+									"const weather = pm.collectionVariables.get('item_weather');",
+									"const imageUrl = pm.collectionVariables.get('item_imageUrl');",
+									"",
+									"const createItemReqOpts = {",
+									"\turl: `${pm.collectionVariables.get(\"base_url\")}/items`,",
+									"  method: 'POST',",
+									"  header: {",
+									"    'Content-Type': 'application/json',",
+									"  },",
+									"  body: JSON.stringify({ name, weather, imageUrl })",
+									"}",
+									"",
+									"pm.sendRequest(createItemReqOpts, function (error, response) {",
+									"  pm.test(\"Preliminary POST /items request should be successful\", () => {",
+									"    pm.expect(response.code).to.be.oneOf([200, 201]);",
+									"  });",
+									"",
+									"  try {",
+									"    if (response.json()) {",
+									"      const item = utils.getData(response.json());",
+									"      pm.collectionVariables.set(\"item_id\", item._id);",
+									"    }",
+									"  } catch (e) {}",
+									"",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/items",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[+] [DELETE] Deletes an item by _id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code should be 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const name = pm.collectionVariables.get('item_name');",
+									"const weather = pm.collectionVariables.get('item_weather');",
+									"const imageUrl = pm.collectionVariables.get('item_imageUrl');",
+									"",
+									"const createItemReqOpts = {",
+									"\turl: `${pm.collectionVariables.get(\"base_url\")}/items`,",
+									"  method: 'POST',",
+									"  header: {",
+									"    'Content-Type': 'application/json',",
+									"  },",
+									"  body: JSON.stringify({ name, weather, imageUrl })",
+									"}",
+									"",
+									"pm.sendRequest(createItemReqOpts, function (error, response) {",
+									"  pm.test(\"Preliminary POST /items request should be successful\", () => {",
+									"    pm.expect(response.code).to.be.oneOf([200, 201]);",
+									"  });",
+									"",
+									"  try {",
+									"    if (response.json()) {",
+									"      const item = utils.getData(response.json());",
+									"      pm.collectionVariables.set(\"item_id\", item._id);",
+									"    }",
+									"  } catch (e) {}",
+									"",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/items/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"items",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{item_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[+] [GET] Check if an item is missing in the database after deleting it",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"The deleted item must not still be in the database\", () => {\r",
+									"    const items = utils.getData(pm.response.json());\r",
+									"    const deletedId = pm.collectionVariables.get(\"item_id\");\r",
+									"    const hasItem = !!items?.find((item) => item._id === deletedId);\r",
+									"\r",
+									"    pm.expect(hasItem).to.eq(false);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const id = pm.collectionVariables.get('item_id');",
+									"",
+									"const createItemReqOpts = {",
+									"\turl: `${pm.collectionVariables.get(\"base_url\")}/items/${id}`,",
+									"  method: 'DELETE',",
+									"  header: {",
+									"    'Content-Type': 'application/json',",
+									"  },",
+									"}",
+									"",
+									"pm.sendRequest(createItemReqOpts, function (error, response) {",
+									"  pm.test(`Preliminary DELETE /items/${id} request should be successful`, () => {",
+									"  pm.expect(response.code).to.be.oneOf([200, 201, 404]);",
+									"});",
+									"",
+									"try {",
+									"  console.log(error ? error : response.json());",
+									"} catch (e) {}",
+									"",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/items",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[-] [DELETE] Deletes an item with an incorrect _id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code should be 400\", () => {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response body should have json with a 'message' property\", () => {\r",
+									"    pm.response.to.have.jsonSchema(JSON.parse(pm.collectionVariables.get(\"schema_message_only\")))\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/items/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"items",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "text"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[-] [DELETE] Deletes an item with a non-existent _id in the database",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code should be 404\", () => {\r",
+									"    pm.response.to.have.status(404);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response body should have json with a 'message' property\", () => {\r",
+									"    pm.response.to.have.jsonSchema(JSON.parse(pm.collectionVariables.get(\"schema_message_only\")))\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/items/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"items",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{user_id_const}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"const schemaMessageOnly = {",
+					"    \"type\": \"object\",",
+					"    \"properties\": {",
+					"        \"message\": {",
+					"            \"type\": \"string\",",
+					"            \"minLength\": 1",
+					"        }",
+					"    },",
+					"    \"required\": [\"message\"]",
+					"};",
+					"",
+					"pm.collectionVariables.set(\"schema_message_only\", JSON.stringify(schemaMessageOnly));",
+					"",
+					"utils = {",
+					"    getData: (jsonData) => {",
+					"        if(Array.isArray(jsonData)) {",
+					"            return jsonData;",
+					"        }",
+					"",
+					"        const keys = Object.keys(jsonData);",
+					"        const firstKey = keys[0];",
+					"        const firstKeyValue = jsonData[firstKey];",
+					"",
+					"        return keys.length === 1 && typeof firstKeyValue === 'object' ? firstKeyValue : jsonData;",
+					"    }",
+					"}"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"pm.test(\"Response should contain a JSON object\", () => {",
+					"    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+					"});"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:3001"
+		},
+		{
+			"key": "user_name",
+			"value": "test"
+		},
+		{
+			"key": "user_avatar",
+			"value": "https://example.com/av.bmp"
+		},
+		{
+			"key": "user_id",
+			"value": ""
+		},
+		{
+			"key": "user_id_const",
+			"value": "61eade4c6d5acf558c42d9b8"
+		},
+		{
+			"key": "user_name_incorrect",
+			"value": "n"
+		},
+		{
+			"key": "user_avatar_incorrect",
+			"value": "https://thisisnotvalidurl"
+		},
+		{
+			"key": "item_name",
+			"value": "testItem"
+		},
+		{
+			"key": "item_imageUrl",
+			"value": "https://example.com/link.test"
+		},
+		{
+			"key": "item_weather",
+			"value": "hot",
+			"type": "string"
+		},
+		{
+			"key": "item_id",
+			"value": ""
+		},
+		{
+			"key": "schema_message_only",
+			"value": ""
+		},
+		{
+			"key": "item_imageUrl_incorrect",
+			"value": "https://thisisnotvalidurl",
+			"type": "string"
+		},
+		{
+			"key": "user_id_code",
+			"value": ""
+		}
+	]
+}
