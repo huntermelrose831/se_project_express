@@ -2,35 +2,35 @@ name: API Tests
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch:
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    
+
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16'
-          cache: 'npm'
-      
+          node-version: "16"
+          cache: "npm"
+
       - name: Install dependencies
         run: npm ci
-      
+
       - name: Install Newman
         run: npm install -g newman
-      
+
       - name: Copy Postman collection
         run: |
           mkdir -p ./postman
-          cp "Sprint 12 Tests.postman_collection.json" ./postman/
-      
+          cp "postman.json" ./postman/
+
       - name: Create environment file
         run: |
           cat > ./postman/environment.json << EOL
@@ -85,7 +85,7 @@ jobs:
             ]
           }
           EOL
-      
+
       - name: Start API server
         run: npm run start &
         env:
@@ -93,13 +93,13 @@ jobs:
           NODE_ENV: test
           JWT_SECRET: ${{ secrets.JWT_SECRET || 'dev-secret' }}
           MONGODB_URI: mongodb://localhost:27017/test_db
-      
+
       - name: Install and start MongoDB
         uses: supercharge/mongodb-github-action@1.10.0
         with:
-          mongodb-version: '5.0'
+          mongodb-version: "5.0"
           mongodb-replica-set: test-rs
-      
+
       - name: Wait for API server to start
         run: |
           echo "Waiting for API server to start..."
@@ -115,10 +115,10 @@ jobs:
             fi
           done
           echo "API server is up and running."
-      
+
       - name: Run Postman tests with Newman
         run: newman run ./postman/Sprint\ 12\ Tests.postman_collection.json -e ./postman/environment.json --bail
-      
+
       - name: Stop API server
         if: always()
         run: pkill -f "node" || true
