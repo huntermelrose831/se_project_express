@@ -8,7 +8,6 @@ const createItem = (req, res) => {
   ClothingItem.create({ name, weather, imageUrl, owner })
     .then((item) => res.status(201).send(item))
     .catch((err) => {
-      console.error(err);
       if (err.name === "ValidationError") {
         return res.status(BAD_REQUEST).send({ message: err.message });
       }
@@ -19,18 +18,13 @@ const createItem = (req, res) => {
 };
 const getItems = (req, res) => {
   ClothingItem.find({})
-    .then((items) => {
-      res.status(200).send(items);
-    })
-    .catch((err) => {
-      console.error(err);
-      return res
+    .then((items) => res.status(200).send(items))
+    .catch(() =>
+      res
         .status(SERVER_ERROR)
-        .send({ message: "An error has occurred on the server" });
-    });
+        .send({ message: "An error has occurred on the server" })
+    );
 };
-
-
 
 const deleteItem = (req, res) => {
   const { itemId } = req.params;
@@ -38,7 +32,6 @@ const deleteItem = (req, res) => {
     .orFail()
     .then(() => res.status(200).send({ message: "Item deleted successfully" }))
     .catch((err) => {
-      console.error(err);
       if (err.name === "CastError") {
         return res
           .status(BAD_REQUEST)
@@ -62,7 +55,6 @@ const likeItem = (req, res) => {
     .orFail()
     .then((item) => res.status(200).send(item))
     .catch((err) => {
-      console.error(err);
       if (err.name === "CastError") {
         return res
           .status(BAD_REQUEST)
@@ -86,7 +78,6 @@ const dislikeItem = (req, res) => {
     .orFail()
     .then((item) => res.status(200).send(item))
     .catch((err) => {
-      console.error(err);
       if (err.name === "CastError") {
         return res
           .status(BAD_REQUEST)
@@ -104,7 +95,7 @@ const dislikeItem = (req, res) => {
 module.exports = {
   createItem,
   getItems,
-  
+
   deleteItem,
   likeItem,
   dislikeItem,

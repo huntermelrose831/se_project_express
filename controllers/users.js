@@ -7,8 +7,7 @@ const getUsers = (req, res) => {
     .then((users) => {
       res.status(200).send(users);
     })
-    .catch((err) => {
-      console.error(err);
+    .catch(() => {
       res
         .status(SERVER_ERROR)
         .send({ message: "An error has occurred on the server" });
@@ -22,7 +21,6 @@ const createUser = (req, res) => {
       res.status(201).send(user);
     })
     .catch((err) => {
-      console.error(err);
       if (err.name === "ValidationError") {
         return res.status(BAD_REQUEST).send({ message: err.message });
       }
@@ -40,11 +38,10 @@ const getUser = (req, res) => {
       if (!user) {
         return res.status(NOT_FOUND).send({ message: "User not found" });
       }
-      res.status(200).send(user);
+      return res.status(200).send(user);
     })
 
     .catch((err) => {
-      console.error(err);
       if (err.name === "CastError") {
         return res
           .status(BAD_REQUEST)
