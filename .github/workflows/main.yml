@@ -32,60 +32,40 @@ jobs:
           cp "postman.json" ./postman/
           # This copies your renamed file (postman.json) to the postman directory
 
-      - name: Create environment file
-        run: |
-          cat > ./postman/environment.json << EOL
-          {
-            "name": "Test Environment",
-            "values": [
-              {
-                "key": "base_url",
-                "value": "http://localhost:3001",
-                "enabled": true
-              },
-              {
-                "key": "user_name",
-                "value": "testUser",
-                "enabled": true
-              },
-              {
-                "key": "user_avatar",
-                "value": "https://example.com/avatar.jpg",
-                "enabled": true
-              },
-              {
-                "key": "user_id_const",
-                "value": "61eade4c6d5acf558c42d9b8",
-                "enabled": true
-              },
-              {
-                "key": "user_avatar_incorrect",
-                "value": "https://thisisnotvalidurl",
-                "enabled": true
-              },
-              {
-                "key": "item_name",
-                "value": "testItem",
-                "enabled": true
-              },
-              {
-                "key": "item_imageUrl",
-                "value": "https://example.com/image.jpg",
-                "enabled": true
-              },
-              {
-                "key": "item_weather",
-                "value": "hot",
-                "enabled": true
-              },
-              {
-                "key": "item_imageUrl_incorrect",
-                "value": "https://thisisnotvalidurl",
-                "enabled": true
-              }
-            ]
-          }
-          EOL
+    - name: Create environment file
+  run: |
+    cat > ./postman/environment.json << EOL
+    {
+      "name": "Test Environment",
+      "values": [
+        {
+          "key": "base_url",
+          "value": "http://localhost:3001",
+          "enabled": true
+        },
+        {
+          "key": "test_email",
+          "value": "test@example.com",
+          "enabled": true
+        },
+        {
+          "key": "test_password",
+          "value": "testPassword123",
+          "enabled": true
+        },
+        {
+          "key": "invalid_email",
+          "value": "invalid@example.com",
+          "enabled": true
+        },
+        {
+          "key": "invalid_password",
+          "value": "wrongPassword",
+          "enabled": true
+        }
+      ]
+    }
+    EOL
 
       - name: Install and start MongoDB
         uses: supercharge/mongodb-github-action@1.10.0
