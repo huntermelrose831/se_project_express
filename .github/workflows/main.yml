@@ -50,4 +50,4 @@ jobs:
       # 8. Run the Postman tests using Newman
       # IMPORTANT: Replace 'path/to/your/collection.json' with the actual path to your Postman collection file in your repository.
       - name: Run Postman tests
-        run: newman run "Sprint 13 Tests.postman_collection.json"
+        run: newman run "postman.json"
