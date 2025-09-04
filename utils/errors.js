@@ -3,6 +3,7 @@ const NOT_FOUND = 404;
 const SERVER_ERROR = 500;
 const DUPLICATE = 409;
 const FORBIDDEN = 403;
+const UNAUTHORIZED = 401;
 const errorCodes = {
   CastError: BAD_REQUEST,
   ValidationError: BAD_REQUEST,
@@ -10,6 +11,7 @@ const errorCodes = {
   DefaultError: SERVER_ERROR,
   DuplicateError: DUPLICATE,
   ForbiddenError: FORBIDDEN,
+  UnauthorizedError: UNAUTHORIZED,
 };
 
 module.exports = {
@@ -19,4 +21,5 @@ module.exports = {
   errorCodes,
   DUPLICATE,
   FORBIDDEN,
+  UNAUTHORIZED,
 };
