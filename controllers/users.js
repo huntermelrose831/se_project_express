@@ -1,5 +1,10 @@
 const User = require("../models/user");
-const { BAD_REQUEST, NOT_FOUND, SERVER_ERROR } = require("../utils/errors");
+const {
+  BAD_REQUEST,
+  NOT_FOUND,
+  SERVER_ERROR,
+  DUPLICATE,
+} = require("../utils/errors");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require("../utils/config");
@@ -39,7 +44,29 @@ const getCurrentUser = (req, res) => {
         .send({ message: "An error has occurred on the server" });
     });
 };
-
+const updateUser = (req, res) => {
+  const { name, avatar } = req.body;
+  User.findByIdAndUpdate(
+    req.user._id,
+    { name, avatar },
+    { new: true, runValidators: true }
+  )
+    .orFail()
+    .then((user) => {
+      res.send(user);
+    })
+    .catch((err) => {
+      if (err.name === "ValidationError") {
+        return res.status(BAD_REQUEST).send({ message: err.message });
+      }
+      if (err.name === "DocumentNotFoundError") {
+        return res.status(NOT_FOUND).send({ message: "User not found" });
+      }
+      return res
+        .status(SERVER_ERROR)
+        .send({ message: "An error has occurred on the server" });
+    });
+};
 const createUser = async (req, res) => {
   const { name, avatar } = req.body;
   const { email, password } = req.body;
@@ -65,7 +92,7 @@ const createUser = async (req, res) => {
 
     // Handle duplicate email error (code 11000)
     if (err.code === 11000) {
-      return res.status(409).send({ message: "Email already exists" });
+      return res.status(DUPLICATE).send({ message: "Email already exists" });
     }
 
     return res
@@ -75,6 +102,11 @@ const createUser = async (req, res) => {
 };
 const login = (req, res) => {
   const { email, password } = req.body;
+  if (!email || !password) {
+    return res
+      .status(BAD_REQUEST)
+      .send({ message: "Email and password are required" });
+  }
   User.findUserByCredentials(email, password)
     .then((user) => {
       // Generate a token and send it in the response
@@ -112,4 +144,11 @@ const getUser = (req, res) => {
         .send({ message: "An error has occurred on the server" });
     });
 };
-module.exports = { getUsers, createUser, getUser, login, getCurrentUser };
+module.exports = {
+  getUsers,
+  createUser,
+  getUser,
+  login,
+  getCurrentUser,
+  updateUser,
+};

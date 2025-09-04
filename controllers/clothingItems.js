@@ -1,5 +1,10 @@
 const ClothingItem = require("../models/clothingItem");
-const { BAD_REQUEST, NOT_FOUND, SERVER_ERROR } = require("../utils/errors");
+const {
+  BAD_REQUEST,
+  NOT_FOUND,
+  SERVER_ERROR,
+  FORBIDDEN,
+} = require("../utils/errors");
 
 const createItem = (req, res) => {
   const { name, weather, imageUrl } = req.body;
@@ -26,24 +31,39 @@ const getItems = (req, res) => {
     );
 };
 
-const deleteItem = (req, res) => {
-  const { itemId } = req.params;
-  ClothingItem.findByIdAndDelete(itemId)
-    .orFail()
-    .then(() => res.status(200).send({ message: "Item deleted successfully" }))
-    .catch((err) => {
-      if (err.name === "CastError") {
-        return res
-          .status(BAD_REQUEST)
-          .send({ message: "Invalid item ID format" });
-      }
-      if (err.name === "DocumentNotFoundError") {
-        return res.status(NOT_FOUND).send({ message: "Item not found" });
-      }
+const deleteItem = async (req, res) => {
+  try {
+    const { itemId } = req.params;
+    const userId = req.user._id;
+
+    // 1. Find the item or fail
+    const item = await ClothingItem.findById(itemId).orFail();
+
+    // 2. Check ownership
+    if (item.owner.toString() !== userId) {
       return res
-        .status(SERVER_ERROR)
-        .send({ message: "An error has occurred on the server" });
-    });
+        .status(FORBIDDEN)
+        .send({ message: "You are not authorized to delete this item" });
+    }
+
+    // 3. If ownership is confirmed, delete the item
+    await ClothingItem.findByIdAndDelete(itemId);
+
+    // 4. Send success response
+    return res.send({ message: "Item deleted successfully" });
+  } catch (err) {
+    // 5. A single catch block handles all errors gracefully
+    if (err.name === "DocumentNotFoundError") {
+      return res.status(NOT_FOUND).send({ message: "Item not found" });
+    }
+    if (err.name === "CastError") {
+      return res.status(BAD_REQUEST).send({ message: "Invalid item ID" });
+    }
+
+    return res
+      .status(SERVER_ERROR)
+      .send({ message: "An error has occurred on the server" });
+  }
 };
 
 const likeItem = (req, res) => {
