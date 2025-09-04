@@ -1,96 +1,70 @@
-# WTWR (What to Wear?): Back End
+# WTWR (What to Wear?): Back End API
 
 ## Project Description
 
-This back-end project creates a RESTful API server for the WTWR (What to Wear?) application, a service that helps users decide what to wear based on the weather. The server provides endpoints for user management and clothing items, complete with features for creating, reading, updating, and deleting resources. Users can create accounts, add clothing items appropriate for different weather conditions, and like/unlike items added by other users.
+This back-end project provides a secure RESTful API for the WTWR (What to Wear?) application. The server handles user authentication, profile management, and the creation and management of clothing items. It is built with Node.js, Express, and MongoDB, and features a full suite of automated tests that run on every code change via GitHub Actions.
 
-## Functionality
+## Core Functionality
 
-- **User Management**:
-
-  - Create new user profiles with name and avatar
-  - Retrieve information about specific users or all users
-  - Secure user data storage
-
+- **Secure User Management**:
+  - User registration (`/signup`) and login (`/signin`) using JWT for authentication.
+  - Secure password storage using `bcrypt` hashing.
+  - Users can retrieve and update their own profile information (`/users/me`).
 - **Clothing Item Management**:
-
-  - Add clothing items with name, weather type, and image
-  - Browse all available clothing items
-  - Update and delete clothing items
-  - Filter items by weather type (hot, warm, cold)
-
+  - Authenticated users can add, and delete their own clothing items.
+  - All users (even unauthenticated) can browse the full list of clothing items.
+  - Ownership is enforced; users can only delete items they have created.
 - **Social Features**:
-
-  - Like/unlike clothing items
-  - Track which users have liked which items
-
-- **Error Handling**:
-  - Comprehensive error messages
-  - Proper HTTP status codes
-  - Validation for data integrity
+  - Authenticated users can "like" and "unlike" clothing items.
+- **Automated Testing**:
+  - A Continuous Integration (CI) pipeline using GitHub Actions automatically runs a full suite of Postman/Newman tests on every push to the `main` branch.
 
 ## Technologies and Techniques Used
 
-### Backend Stack
-
-- **Node.js**: JavaScript runtime environment
-- **Express.js**: Web server framework
-- **MongoDB**: NoSQL database for storing user and item data
-- **Mongoose**: Object data modeling library for MongoDB
-
-### Development Tools
-
-- **ESLint**: Code quality and style checking (Airbnb configuration)
-- **Prettier**: Code formatting
-- **Nodemon**: Development server with auto-reload capability
-
-### API Design
-
-- **RESTful Architecture**: Standard HTTP methods (GET, POST, PUT, DELETE)
-- **JSON**: Data format for request/response communication
-- **Middleware Pattern**: For request processing and authentication simulation
-
-### Data Validation
-
-- **Validator.js**: URL validation for avatar and image URLs
-- **Mongoose Schemas**: Data structure enforcement with built-in validators
+- **Backend**: Node.js, Express.js
+- **Database**: MongoDB with Mongoose for data modeling and validation.
+- **Authentication**: JSON Web Tokens (JWT) for securing endpoints.
+- **Security**: `bcryptjs` for password hashing, middleware for authorization.
+- **Development Tools**: ESLint (Airbnb config), Prettier, Nodemon for hot-reloading.
+- **CI/CD**: GitHub Actions and Newman for automated API testing.
 
 ## API Endpoints
 
-### Users
+### Authentication
 
-- `GET /users` - Returns all users
-- `GET /users/:userId` - Returns a specific user by ID
-- `POST /users` - Creates a new user
+- `POST /signup` - Creates a new user.
+- `POST /signin` - Logs in a user and returns a JWT.
+
+### Users (Requires Authentication)
+
+- `GET /users/me` - Returns the logged-in user's profile information.
+- `PATCH /users/me` - Updates the logged-in user's name and avatar.
 
 ### Clothing Items
 
-- `GET /items` - Returns all clothing items
-- `POST /items` - Creates a new clothing item
-- `DELETE /items/:itemId` - Deletes a specific item
-- `PUT /items/:itemId/likes` - Adds the current user to the item's likes
-- `DELETE /items/:itemId/likes` - Removes the current user from the item's likes
+- `GET /items` - Returns all clothing items. (Publicly accessible)
+- `POST /items` - Creates a new clothing item. (Requires Authentication)
+- `DELETE /items/:itemId` - Deletes an item by its ID. (Requires Authentication & Ownership)
+- `PUT /items/:itemId/likes` - Adds a "like" to an item. (Requires Authentication)
+- `DELETE /items/:itemId/likes` - Removes a "like" from an item. (Requires Authentication)
 
-## Screenshots
-
-[Add screenshots of your API responses, perhaps from Postman tests]
-
-## Demo Video
-
-[Add a link to a video demonstration of your API in action]
-
-## Running the Project
+## Project Setup and Usage
 
 ```bash
-# Install dependencies
+# 1. Clone the repository
+git clone https://github.com/huntermelrose831/se_project_express.git
+
+# 2. Navigate to the project directory
+cd se_project_express
+
+# 3. Install dependencies
 npm install
 
-# Start the server
+# 4. Start the server for production
 npm run start
 
-# Start with hot-reload for development
+# 5. Start the server with hot-reload for development
 npm run dev
-
-# Run linting
-npm run lint
 ```
+
+The server will be running on `http://localhost:3001`.
