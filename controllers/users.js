@@ -15,6 +15,31 @@ const getUsers = (req, res) => {
         .send({ message: "An error has occurred on the server" });
     });
 };
+const getCurrentUser = (req, res) => {
+  const userId = req.user._id;
+  User.findById(userId)
+    .orFail()
+    .then((user) => {
+      // Remove password from response
+      const userResponse = user.toObject();
+      delete userResponse.password;
+      res.status(200).send(userResponse);
+    })
+    .catch((err) => {
+      if (err.name === "DocumentNotFoundError") {
+        return res.status(NOT_FOUND).send({ message: "User not found" });
+      }
+      if (err.name === "CastError") {
+        return res
+          .status(BAD_REQUEST)
+          .send({ message: "Invalid user ID format" });
+      }
+      return res
+        .status(SERVER_ERROR)
+        .send({ message: "An error has occurred on the server" });
+    });
+};
+
 const createUser = async (req, res) => {
   const { name, avatar } = req.body;
   const { email, password } = req.body;
@@ -87,4 +112,4 @@ const getUser = (req, res) => {
         .send({ message: "An error has occurred on the server" });
     });
 };
-module.exports = { getUsers, createUser, getUser, login };
+module.exports = { getUsers, createUser, getUser, login, getCurrentUser };
