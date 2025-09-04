@@ -1,71 +1,53 @@
-name: API Tests
+name: Express App CI
 
+# Controls when the workflow will run
 on:
   push:
-    branches: [main]
+    branches: [ "main" ]
   pull_request:
-    branches: [main]
-  workflow_dispatch:
+    branches: [ "main" ]
 
 jobs:
   test:
+    # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      # 1. Checks out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
+      # 2. Sets up Node.js in the runner
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: "16"
-          cache: "npm"
+          node-version: '20.x'
 
+      # 3. Starts a MongoDB service for the tests to use
+      - name: Start MongoDB
+        uses: supercharge/mongodb-github-action@1.10.0
+        with:
+          mongodb-version: '6.0' # Or your preferred version
+
+      # 4. Installs project dependencies
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
+      # 5. Installs Newman, the command-line runner for Postman
       - name: Install Newman
         run: npm install -g newman
 
-      - name: Copy Postman collection
-        run: |
-          mkdir -p ./postman
-          cp "postman.json" ./postman/
+      # 6. Runs the Express server in the background
+      # The `&` symbol is crucial to allow the next step to run
+      - name: Run server
+        run: npm start &
 
-      - name: Create environment file
-        run: |
-          cat > ./postman/environment.json << EOL
-          {
-            "name": "Test Environment", 
-            "values": [
-              {
-                "key": "base_url",
-                "value": "http://localhost:3001",
-                "enabled": true
-              }
-            ]
-          }
-          EOL
+      # 7. Wait for the server to be ready
+      # This prevents tests from running before the app is listening
+      - name: Wait for server
+        run: sleep 5
 
-      - name: Install and start MongoDB
-        uses: supercharge/mongodb-github-action@1.10.0
-        with:
-          mongodb-version: "5.0"
-          mongodb-replica-set: test-rs
-
-      - name: Start API server
-        run: |
-          npm start > api.log 2>&1 &
-          sleep 10
-          cat api.log
-        env:
-          PORT: 3001
-          NODE_ENV: test
-          JWT_SECRET: ${{ secrets.JWT_SECRET || 'dev-secret' }}
-          MONGODB_URI: mongodb://localhost:27017/test_db
-
-      - name: Run Postman tests with Newman
-        run: newman run ./postman/postman.json -e ./postman/environment.json --bail
-
-      - name: Stop API server
-        if: always()
-        run: pkill -f "node" || true
+      # 8. Run the Postman tests using Newman
+      # IMPORTANT: Replace 'path/to/your/collection.json' with the actual path to your Postman collection file in your repository.
+      - name: Run Postman tests
+        run: newman run "Sprint 13 Tests.postman_collection.json"
