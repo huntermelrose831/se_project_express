@@ -30,42 +30,21 @@ jobs:
         run: |
           mkdir -p ./postman
           cp "postman.json" ./postman/
-          # This copies your renamed file (postman.json) to the postman directory
 
-    - name: Create environment file
-  run: |
-    cat > ./postman/environment.json << EOL
-    {
-      "name": "Test Environment",
-      "values": [
-        {
-          "key": "base_url",
-          "value": "http://localhost:3001",
-          "enabled": true
-        },
-        {
-          "key": "test_email",
-          "value": "test@example.com",
-          "enabled": true
-        },
-        {
-          "key": "test_password",
-          "value": "testPassword123",
-          "enabled": true
-        },
-        {
-          "key": "invalid_email",
-          "value": "invalid@example.com",
-          "enabled": true
-        },
-        {
-          "key": "invalid_password",
-          "value": "wrongPassword",
-          "enabled": true
-        }
-      ]
-    }
-    EOL
+      - name: Create environment file
+        run: |
+          cat > ./postman/environment.json << EOL
+          {
+            "name": "Test Environment", 
+            "values": [
+              {
+                "key": "base_url",
+                "value": "http://localhost:3001",
+                "enabled": true
+              }
+            ]
+          }
+          EOL
 
       - name: Install and start MongoDB
         uses: supercharge/mongodb-github-action@1.10.0
@@ -73,27 +52,19 @@ jobs:
           mongodb-version: "5.0"
           mongodb-replica-set: test-rs
 
-      # CHANGE 1: Start API server with debugging
       - name: Start API server
         run: |
           npm start > api.log 2>&1 &
-          # This runs your server and redirects both standard output (>) and errors (2>&1) to api.log
-          # The & at the end makes the process run in background so the workflow can continue
           sleep 10
-          # Added a longer initial sleep to give the API more time to initialize before checking logs
           cat api.log
-          # This displays the log file so you can see startup messages in the workflow output
         env:
           PORT: 3001
           NODE_ENV: test
           JWT_SECRET: ${{ secrets.JWT_SECRET || 'dev-secret' }}
           MONGODB_URI: mongodb://localhost:27017/test_db
 
-      # CHANGE 3: Updated Newman command to use the correct filename
       - name: Run Postman tests with Newman
         run: newman run ./postman/postman.json -e ./postman/environment.json --bail
-        # Changed from ./postman/Sprint\ 12\ Tests.postman_collection.json to ./postman/postman.json
-        # to match the filename you're now using
 
       - name: Stop API server
         if: always()
