@@ -4,10 +4,14 @@ const userRouter = require("./users");
 const { login, createUser } = require("../controllers/users");
 const auth = require("../middlewares/auth");
 const { NOT_FOUND } = require("../utils/errors");
+const {
+  validateAuthentication,
+  validateUserBody,
+} = require("../middlewares/validation");
 
 // Unprotected routes
-router.post("/signin", login);
-router.post("/signup", createUser);
+router.post("/signin", validateAuthentication, login);
+router.post("/signup", validateUserBody, createUser);
 
 // The GET /items route is public, but other /items routes are protected.
 // We can't use router.use('/items', clothingItemRouter) before the auth middleware.
