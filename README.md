@@ -1,5 +1,11 @@
 # WTWR (What to Wear?): Back End API
 
+## Links
+
+- **Backend API:** https://api.whattowearproject.jumpingcrab.com
+- **Frontend Repository:** https://github.com/huntermelrose831/se_project_react
+- **Project Pitch Video:** [Add your video link here after recording]
+
 ## Project Description
 
 This back-end project provides a secure RESTful API for the WTWR (What to Wear?) application. The server handles user authentication, profile management, and the creation and management of clothing items. It is built with Node.js, Express, and MongoDB, and features a full suite of automated tests that run on every code change via GitHub Actions.
