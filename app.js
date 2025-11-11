@@ -21,8 +21,22 @@ mongoose
     throw new Error(`Database connection failed: ${e.message}`);
   });
 
+const allowedOrigins = [
+  "http://localhost:3000",
+  "http://localhost:3001",
+  "https://whattowearproject.jumpingcrab.com",
+  "https://www.whattowearproject.jumpingcrab.com",
+];
+
 app.use(express.json());
-app.use(cors());
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
 // enable request logger
 app.use(requestLogger);
