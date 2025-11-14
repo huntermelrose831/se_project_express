@@ -24,6 +24,7 @@ mongoose
 const allowedOrigins = [
   "http://localhost:3000",
   "http://localhost:3001",
+  "https://api.whattowearproject.jumpingcrab.com",
   "https://whattowearproject.jumpingcrab.com",
   "https://www.whattowearproject.jumpingcrab.com",
 ];
