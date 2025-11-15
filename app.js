@@ -5,6 +5,7 @@ const cors = require("cors");
 const { errors } = require("celebrate");
 const { errorHandler } = require("./middlewares/error-handler");
 const { requestLogger, errorLogger } = require("./middlewares/logger");
+const NotFoundError = require("./utils/errors/NotFoundError");
 
 require("dotenv").config();
 
@@ -50,6 +51,11 @@ app.get("/crash-test", () => {
 });
 
 app.use("/", mainRouter);
+
+// 404 handler for non-existent routes
+app.use((req, res, next) => {
+  next(new NotFoundError("Requested resource not found"));
+});
 
 // enable error logger
 app.use(errorLogger);
