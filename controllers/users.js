@@ -27,23 +27,7 @@ const getCurrentUser = (req, res, next) => {
       }
     });
 };
-      delete userResponse.password;
-      res.status(200).send(userResponse);
-    })
-    .catch((err) => {
-      if (err.name === "DocumentNotFoundError") {
-        return res.status(NOT_FOUND).send({ message: "User not found" });
-      }
-      if (err.name === "CastError") {
-        return res
-          .status(BAD_REQUEST)
-          .send({ message: "Invalid user ID format" });
-      }
-      return res
-        .status(SERVER_ERROR)
-        .send({ message: "An error has occurred on the server" });
-    });
-};
+
 const updateUser = (req, res, next) => {
   const { name, avatar } = req.body;
   User.findByIdAndUpdate(
