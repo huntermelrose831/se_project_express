@@ -11,10 +11,9 @@ const createItem = (req, res, next) => {
     .then((item) => res.status(201).send(item))
     .catch((err) => {
       if (err.name === "ValidationError") {
-        next(new BadRequestError("Invalid data provided"));
-      } else {
-        next(err);
+        return next(new BadRequestError("Invalid data provided"));
       }
+      return next(err);
     });
 };
 const getItems = (req, res, next) => {
@@ -33,7 +32,9 @@ const deleteItem = async (req, res, next) => {
 
     // 2. Check ownership
     if (item.owner.toString() !== userId) {
-      throw new ForbiddenError("You are not authorized to delete this item");
+      return next(
+        new ForbiddenError("You are not authorized to delete this item")
+      );
     }
 
     // 3. If ownership is confirmed, delete the item
@@ -44,12 +45,12 @@ const deleteItem = async (req, res, next) => {
   } catch (err) {
     // 5. A single catch block handles all errors gracefully
     if (err.name === "DocumentNotFoundError") {
-      next(new NotFoundError("Item not found"));
-    } else if (err.name === "CastError") {
-      next(new BadRequestError("Invalid item ID"));
-    } else {
-      next(err);
+      return next(new NotFoundError("Item not found"));
     }
+    if (err.name === "CastError") {
+      return next(new BadRequestError("Invalid item ID"));
+    }
+    return next(err);
   }
 };
 

@@ -1,6 +1,5 @@
 const errorHandler = (err, req, res, next) => {
-  // Log the error to the console
-  console.error(err);
+  // Log the error using a logger if needed
 
   // Get status code from error or default to 500
   const { statusCode = 500, message } = err;

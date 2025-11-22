@@ -1,13 +1,13 @@
+require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
-const mainRouter = require("./routes/index");
-const cors = require("cors");
 const { errors } = require("celebrate");
+const cors = require("cors");
+const mainRouter = require("./routes/index");
+
 const { errorHandler } = require("./middlewares/error-handler");
 const { requestLogger, errorLogger } = require("./middlewares/logger");
 const NotFoundError = require("./utils/errors/NotFoundError");
-
-require("dotenv").config();
 
 const app = express();
 const { PORT = 3001, MONGODB_URI = "mongodb://127.0.0.1:27017/wtwr_db" } =
@@ -16,7 +16,7 @@ const { PORT = 3001, MONGODB_URI = "mongodb://127.0.0.1:27017/wtwr_db" } =
 mongoose
   .connect(MONGODB_URI)
   .then(() => {
-    console.log("Connected to MongoDB");
+    // database successfully connected
   })
   .catch((e) => {
     throw new Error(`Database connection failed: ${e.message}`);
@@ -67,5 +67,5 @@ app.use(errors());
 app.use(errorHandler);
 
 app.listen(PORT, () => {
-  console.log(`App listening at port ${PORT}`);
+  // server started
 });
