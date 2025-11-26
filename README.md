@@ -4,7 +4,7 @@
 
 - **Backend API:** https://api.whattowearproject.jumpingcrab.com
 - **Frontend Repository:** https://github.com/huntermelrose831/se_project_react
-- **Project Pitch Video:** [Add your video link here after recording]
+- **Project Pitch Video:** [(https://www.loom.com/share/86b20e79ec654d10ab7f8646fc1dcc98)]
 
 ## Project Description
 
